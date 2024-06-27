@@ -1,5 +1,5 @@
 [submodule "pqclean"]
 	path = pqclean
-	url = https://github.com/pqclean/pqclean
+	url = git@github.com:dgazzoni/NTRU-sampling-pqclean.git
 	branch = master
 

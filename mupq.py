@@ -358,7 +358,7 @@ class Converter(object):
         self._header("Speed Evaluation")
         self._subheader("Key Encapsulation Schemes")
         self._tablehead(["scheme", "implementation", "key generation [cycles]",
-                         "encapsulation [cycles]", "decapsulation [cycles]"])
+                         "encapsulation [cycles]", "decapsulation [cycles]", "sample_fixed_type [cycles]"])
         self._processPrimitives("benchmarks/speed/crypto_kem/", "speed", "crypto_kem")
 
         self._subheader("Signature Schemes")
@@ -452,6 +452,11 @@ class Converter(object):
             if type_ == "crypto_kem":
                 encsign    = int(parts[parts.index("encaps cycles:")+1])
                 decverify    = int(parts[parts.index("decaps cycles:")+1])
+                if "sample_fixed_type cycles:" in parts:
+                    sft = int(parts[parts.index("sample_fixed_type cycles:")+1])
+                else:
+                    sft = 0
+                return [keygen, encsign, decverify, sft]
             else: # crypto_sign
                 encsign    = int(parts[parts.index("sign cycles:")+1])
                 decverify    = int(parts[parts.index("verify cycles:")+1])
@@ -470,7 +475,8 @@ class Converter(object):
             keygen    = self._formatStats([item[0] for item in data])
             encsign   = self._formatStats([item[1] for item in data])
             decverify = self._formatStats([item[2] for item in data])
-            self._row([f"{scheme} ({len(data)} executions)", implementation, keygen, encsign, decverify])
+            sft       = self._formatStats([item[3] for item in data])
+            self._row([f"{scheme} ({len(data)} executions)", implementation, keygen, encsign, decverify, sft])
         elif benchmark == "stack":
             keygen     = self._formatNumber(max([item[0] for item in data]))
             encsign    = self._formatNumber(max([item[1] for item in data]))
@@ -532,7 +538,8 @@ class CsvConverter(Converter):
         self._tablehead(["Scheme", "Implementation"] +
                         [f"Key Generation [cycles] ({x})" for x in ["mean", "min", "max"]] +
                         [f"Encapsulation [cycles] ({x})" for x in ["mean", "min", "max"]] +
-                        [f"Decapsulation [cycles] ({x})" for x in ["mean", "min", "max"]])
+                        [f"Decapsulation [cycles] ({x})" for x in ["mean", "min", "max"]] +
+                        [f"sample_fixed_type [cycles] ({x})" for x in ["mean", "min", "max"]])
 
         cyclesKem = self._processPrimitives("benchmarks/speed/crypto_kem/", "speed", "crypto_kem")
 
